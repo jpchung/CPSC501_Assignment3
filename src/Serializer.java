@@ -21,6 +21,10 @@ public class Serializer {
         Element valueElement;
         Element referenceElement;
 
+        ArrayList<Element> elementContents = new ArrayList<>();
+        ArrayList<Element> arrayValues = new ArrayList<>();
+        ArrayList<Element> arrayReferences = new ArrayList<>();
+
 
         Class objClass = obj.getClass();
 
@@ -50,13 +54,26 @@ public class Serializer {
                         valueElement = new Element("value");
                         String elementValue =  String.valueOf(Array.get(obj, i));
                         valueElement.addContent(elementValue);
+
+                        arrayValues.add(valueElement);
+                        elementContents = arrayValues;
+
                     }
                     else {
                         referenceElement = new Element("reference");
-                        //store object id as content for reference element
-                        referenceElement.addContent(objId);
+                        //store object id of array element as content for reference element
+                        //also add to object identity hashmap
+                        String arrayObjId = Integer.toString(objMap.size());
+                        objMap.put(Array.get(obj, i), arrayObjId);
+                        referenceElement.addContent(arrayObjId);
+
+                        arrayReferences.add(referenceElement);
+                        elementContents = arrayReferences;
                     }
                 }
+
+                //add array elements as content for array object element
+                objElement.setContent(elementContents);
 
             }
 
@@ -65,6 +82,7 @@ public class Serializer {
 
             for (Field f : objFields){
                 f.setAccessible(true);
+                Class fieldType = f.getType();
 
                 // uniquely identify each field element (declaring class  + field name)
                 fieldElement = new Element("field");
@@ -76,6 +94,7 @@ public class Serializer {
                 valueElement = new Element("value");
                 referenceElement = new Element("reference");
 
+                String fieldValue;
 
                 /*
                     get value for each field
@@ -88,17 +107,21 @@ public class Serializer {
                             -then serialize EACH ELEMENT of array
                                 -use recursion if element is an object
                 */
-                if(f.getType().isArray()){
+                if(fieldType.isArray()){
                     //field is array object, serialize it
 
                     //then serialize each element (recursive if element is object)
                 }
-                else if(!f.getType().isPrimitive()){
+                else if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
                     //non-array object, recursively serialize
 
                 }
                 else{
-                    //field is primitive, just store as value element
+                    //field is primitive/wrapper, just store value as content
+                    fieldValue =  f.get(obj).toString();
+                    valueElement.addContent(fieldValue);
+
+                    fieldElement.setContent(valueElement);
 
                 }
 
@@ -110,12 +133,13 @@ public class Serializer {
             e.printStackTrace();
         }
 
+        //XML outputter logic goes here
 
-
-
-        //REMOVE LATER: placeholder return
+        //return serialized object as XML Document
         return document;
     }
+
+
 
     public boolean isWrapperClass(Class objClass){
         boolean isWrapper = false;
