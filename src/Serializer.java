@@ -1,10 +1,18 @@
 /**
  * Serializer class for Sender program
  * @author Johnny Chung
+ *
+ * References:
+ * <p/> IdentityHashMap: https://docs.oracle.com/javase/7/docs/api/java/util/IdentityHashMap.html
+ * <p/> JDOM Document,Element: http://www.jdom.org/docs/apidocs.1.1/
+ * <p/> JDOM Output: http://www.jdom.org/docs/apidocs.1.1/org/jdom/output/package-summary.html
  */
 
+import java.io.FileWriter;
 import java.lang.reflect.*;
 import org.jdom.*;
+import org.jdom.output.*;
+
 import java.util.*;
 
 public class Serializer {
@@ -24,6 +32,7 @@ public class Serializer {
         ArrayList<Element> elementContents = new ArrayList<>();
         ArrayList<Element> arrayValues = new ArrayList<>();
         ArrayList<Element> arrayReferences = new ArrayList<>();
+        ArrayList<Element> arrayFields = new ArrayList<>();
 
 
         Class objClass = obj.getClass();
@@ -77,6 +86,7 @@ public class Serializer {
 
             }
 
+            System.out.println("Serializing fields...");
             //get list of all object fields
             Field objFields[] = objClass.getDeclaredFields();
 
@@ -94,7 +104,6 @@ public class Serializer {
                 valueElement = new Element("value");
                 referenceElement = new Element("reference");
 
-                String fieldValue;
 
                 /*
                     get value for each field
@@ -113,27 +122,48 @@ public class Serializer {
                     //then serialize each element (recursive if element is object)
                 }
                 else if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
-                    //non-array object, recursively serialize
+                    //field is non-array object, will serialize after storing reference as content
+                    //field object will be nested in root element, not in field
+                    String fieldObjId = Integer.toString(objMap.size());
+                    objMap.put(f.get(obj), fieldObjId);
+                    referenceElement.addContent(fieldObjId);
+
+                    fieldElement.setContent(referenceElement);
+                    arrayFields.add(fieldElement);
 
                 }
                 else{
                     //field is primitive/wrapper, just store value as content
-                    fieldValue =  f.get(obj).toString();
+                    String fieldValue =  f.get(obj).toString();
                     valueElement.addContent(fieldValue);
 
                     fieldElement.setContent(valueElement);
+                    arrayFields.add(fieldElement);
 
                 }
 
+                objElement.setContent(arrayFields);
+
             }
 
+            //add serialized object to root element
+            rootElement.addContent(objElement);
+            System.out.println("Object serialization complete, writing to file...");
+
+
+            //use XMLOutputter to format document as xml and write to file
+            XMLOutputter xmlOutputter = new XMLOutputter();
+            xmlOutputter.setFormat(Format.getPrettyFormat());
+            FileWriter fileWriter = new FileWriter("serializedObject.xml");
+            xmlOutputter.output(document, fileWriter);
+
+            System.out.println("Writing to file complete");
 
         }
         catch(Exception e){
             e.printStackTrace();
         }
 
-        //XML outputter logic goes here
 
         //return serialized object as XML Document
         return document;
