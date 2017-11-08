@@ -5,6 +5,7 @@
 
 import java.lang.reflect.*;
 import org.jdom.*;
+import java.util.*;
 public class Deserializer {
 
     public Object deserialize(org.jdom.Document document){
