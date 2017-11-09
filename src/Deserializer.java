@@ -33,7 +33,7 @@ public class Deserializer {
             for(int i =0; i < objList.size(); i++){
                 Element objElement = (Element) objList.get(i);
 
-                //create uninitialized instance
+                //create uninitialized instance using element attribute
                 Class objClass =  Class.forName(objElement.getAttributeValue("class"));
 
                 //check for class type then create new instance
@@ -69,7 +69,16 @@ public class Deserializer {
 
                 }
                 else{
+                    //non-array object, assign values to all fields
+                    Field objFields[] = objClass.getDeclaredFields();
 
+                    for(Field f : objFields){
+                        f.setAccessible(true);
+
+                        Class fieldType =  f.getType();
+
+
+                    }
                 }
 
 
@@ -110,10 +119,6 @@ public class Deserializer {
                     - set element's value using Array.set()
                     - check if element primitive or reference and treat accordingly
         */
-
-        //for each object, create an uninitialized instance
-            //class name should be attribute of object element,
-            //so dynamically load its class using forName()
 
 
 

@@ -17,8 +17,6 @@ import java.util.*;
 
 public class Serializer {
 
-
-
     public static Document serialize(Object obj){
 
         //initialize Document with root element (tag name: serialized)
@@ -160,7 +158,7 @@ public class Serializer {
             FileWriter fileWriter = new FileWriter("serializedObject.xml");
             xmlOutputter.output(document, fileWriter);
 
-            System.out.println("Writing to file complete");
+            System.out.println("Writing to file complete!");
 
         }
         catch(Exception e){
