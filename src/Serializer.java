@@ -19,7 +19,7 @@ public class Serializer {
 
 
 
-    public Document serialize(Object obj){
+    public static Document serialize(Object obj){
 
         //initialize Document with root element (tag name: serialized)
         Element rootElement = new Element("serialized");
@@ -41,7 +41,8 @@ public class Serializer {
             //give object unique identifier
             IdentityHashMap objMap = new IdentityHashMap<>();
             String objId = Integer.toString(objMap.size()); //use index/size of IdHashMap as id for each object
-            objMap.put(obj, objId);
+            //objMap.put(obj, objId);
+            objMap.put(objId, obj);
 
             //create object element (nested within root element) with class and id attributes
             objElement = new Element("object");
@@ -73,7 +74,8 @@ public class Serializer {
                         //store object id of array element as content for reference element
                         //also add to object identity hashmap
                         String arrayObjId = Integer.toString(objMap.size());
-                        objMap.put(Array.get(obj, i), arrayObjId);
+                        //objMap.put(Array.get(obj, i), arrayObjId);
+                        objMap.put(arrayObjId, Array.get(obj, i));
                         referenceElement.addContent(arrayObjId);
 
                         arrayReferences.add(referenceElement);
@@ -125,7 +127,8 @@ public class Serializer {
                     //field is non-array object, will serialize after storing reference as content
                     //field object will be nested in root element, not in field
                     String fieldObjId = Integer.toString(objMap.size());
-                    objMap.put(f.get(obj), fieldObjId);
+                    //objMap.put(f.get(obj), fieldObjId);
+                    objMap.put(fieldObjId, f.get(obj));
                     referenceElement.addContent(fieldObjId);
 
                     fieldElement.setContent(referenceElement);
@@ -171,7 +174,7 @@ public class Serializer {
 
 
 
-    public boolean isWrapperClass(Class objClass){
+    public static boolean isWrapperClass(Class objClass){
         boolean isWrapper = false;
 
         try {

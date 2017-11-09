@@ -1,16 +1,85 @@
 /**
  * Deserializer class for Receiver program
  * @author Johnny Chung
+ *
+ * References:
+ * <p/> JDOM Document,Element: http://www.jdom.org/docs/apidocs.1.1/
+ * <p/> JDOM input: http://www.jdom.org/docs/apidocs.1.1/org/jdom/input/package-summary.html
  */
 
 import java.lang.reflect.*;
 import org.jdom.*;
+import org.jdom.input.*;
+import java.io.*;
 import java.util.*;
 public class Deserializer {
 
-    public Object deserialize(org.jdom.Document document){
+    public static Object deserialize(org.jdom.Document document){
 
-        //get list of objects stored in XML document
+        HashMap objMap =  new HashMap();
+
+        //MOVE LATER: deserialize XML document with SAXBuilder to get list of objects
+        //SAXBuilder saxBuilder = new SAXBuilder();
+        //File xmlFile = new File("serializedObject.xml");
+
+        try{
+            //MOVE LATER: Document document = (Document)saxBuilder.build(xmlFile);
+            //assume document built properly
+
+            //get root element and list of nested object elements
+            Element rootElement = document.getRootElement();
+            List objList = rootElement.getChildren("object");
+
+            for(int i =0; i < objList.size(); i++){
+                Element objElement = (Element) objList.get(i);
+
+                //create uninitialized instance
+                Class objClass =  Class.forName(objElement.getAttributeValue("class"));
+
+                //check for class type then create new instance
+                Object objInstance;
+                if(objClass.isArray()){
+                    //get length (via element attributes) and component type of array object instantiation
+                    int arrayLength = Array.getLength(objElement.getAttributeValue("length"));
+                    Class arrayType = objClass.getComponentType();
+
+                    objInstance = Array.newInstance(arrayType, arrayLength);
+
+                }
+                else{
+                    //non-array object, instantiate with no arg constructor
+                    Constructor constructor =  objClass.getConstructor(null);
+                    //check constructor modifiers, just in case
+                    if(!Modifier.isPublic(constructor.getModifiers())){
+                        constructor.setAccessible(true);
+                    }
+
+                    objInstance = constructor.newInstance(null);
+                }
+
+                //associate the new instance with the object's unique id (element attribute)
+                String objId = objElement.getAttributeValue("id");
+                objMap.put(objId, objInstance);
+
+
+                //WRITE FIRST, REFACTOR LATER:
+                // if array object, set value of each element
+                // if non-array object, assign values to all fields/instance variables
+                if(objClass.isArray()){
+
+                }
+                else{
+
+                }
+
+
+            }
+
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
 
         /*
         For each object,
@@ -19,7 +88,7 @@ public class Deserializer {
             - create an instance of the class
                 - if non-array object, get declared no-arg constructor, then use newInstance()
                     - may need to set accessible
-                - if non-array object, use Array.newInstance()
+                - if array object, use Array.newInstance()
                     - use getComponentType() for element type
                     - array length is attribute of object element
             - associate the new instance with the object's unique identifier using a table
