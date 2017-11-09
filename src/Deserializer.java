@@ -14,7 +14,10 @@ import java.io.*;
 import java.util.*;
 public class Deserializer {
 
-    public static Object deserialize(org.jdom.Document document){
+    public static Object deserialize(Document document){
+
+        //Object to be instantiated via deserialization
+        Object obj;
 
         HashMap objMap =  new HashMap();
 
@@ -62,23 +65,57 @@ public class Deserializer {
                 objMap.put(objId, objInstance);
 
 
+
+                //get list of all children of object element (fields if non-array, elements if array)
+                List objChildrenList = objElement.getChildren();
+
                 //WRITE FIRST, REFACTOR LATER:
                 // if array object, set value of each element
                 // if non-array object, assign values to all fields/instance variables
                 if(objClass.isArray()){
 
+                    //get component type
+                    Class arrayType =  objClass.getComponentType();
+
+                    for(int j= 0; j < objChildrenList.size(); j++){
+
+                    }
                 }
                 else{
                     //non-array object, assign values to all fields
-                    Field objFields[] = objClass.getDeclaredFields();
+                    for(int j = 0; j < objChildrenList.size(); j++){
+                        Element fieldElement = (Element) objChildrenList.get(i);
 
-                    for(Field f : objFields){
-                        f.setAccessible(true);
+                        //get declaring class (via field attribute) and load class dynamically
+                        Class declaringClass =  Class.forName(fieldElement.getAttributeValue("declaringclass"));
 
-                        Class fieldType =  f.getType();
+                        //get field name (field attribute)
+                        String fieldName = fieldElement.getAttributeValue("name");
+
+                        //find Field metaobject in declaring class
+                        Field field = declaringClass.getDeclaredField(fieldName);
+
+                        if(!Modifier.isPublic(field.getModifiers())){
+                            field.setAccessible(true);
+                        }
+
+                        //set value for field
+                        Class fieldType = field.getType();
+                        if(!fieldType.isArray() && !Serializer.isWrapperClass(fieldType)){
+
+                        }
+                        else{
+
+                        }
 
 
                     }
+
+
+
+
+
+
                 }
 
 

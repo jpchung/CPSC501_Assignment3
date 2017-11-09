@@ -91,7 +91,10 @@ public class Serializer {
             Field objFields[] = objClass.getDeclaredFields();
 
             for (Field f : objFields){
-                f.setAccessible(true);
+                if(!Modifier.isPublic(f.getModifiers())){
+                    f.setAccessible(true);
+                }
+
                 Class fieldType = f.getType();
 
                 // uniquely identify each field element (declaring class  + field name)
