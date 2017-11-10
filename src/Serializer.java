@@ -18,10 +18,23 @@ import java.util.*;
 public class Serializer {
 
     public static Document serialize(Object obj){
-
         //initialize Document with root element (tag name: serialized)
         Element rootElement = new Element("serialized");
         Document document = new Document(rootElement);
+
+        IdentityHashMap objMap = new IdentityHashMap<>();
+
+        Document serializedDocument = serializeObject(obj, document, objMap);
+
+        return serializedDocument;
+
+    }
+
+
+    private static Document serializeObject(Object obj, Document document, IdentityHashMap objMap){
+
+        //Element rootElement = new Element("serialized");
+        //Document document = new Document(rootElement);
         Element objElement;
         Element fieldElement;
         Element valueElement;
@@ -37,7 +50,7 @@ public class Serializer {
 
         try {
             //give object unique identifier
-            IdentityHashMap objMap = new IdentityHashMap<>();
+            //IdentityHashMap objMap = new IdentityHashMap<>();
             String objId = Integer.toString(objMap.size()); //use index/size of IdHashMap as id for each object
             //objMap.put(obj, objId);
             objMap.put(objId, obj);
@@ -47,7 +60,9 @@ public class Serializer {
             objElement.setAttribute("class", objClass.getName());
             objElement.setAttribute("id", objId);
 
-            //check if object is array type
+
+            /* */
+            //check if object is array type (in cases of recursive call))
             if(objClass.isArray()){
                 //add additional length attribute to object element
                 String arrayLength = String.valueOf(Array.getLength(obj));
@@ -91,67 +106,22 @@ public class Serializer {
             Field objFields[] = objClass.getDeclaredFields();
 
             for (Field f : objFields){
+
                 if(!Modifier.isPublic(f.getModifiers())){
                     f.setAccessible(true);
                 }
 
-                Class fieldType = f.getType();
-
-                // uniquely identify each field element (declaring class  + field name)
-                fieldElement = new Element("field");
-                String declaringClass =  f.getDeclaringClass().getName();
-                String fieldName = f.getName();
-                fieldElement.setAttribute("name", fieldName);
-                fieldElement.setAttribute("declaringclass", declaringClass);
-
-                valueElement = new Element("value");
-                referenceElement = new Element("reference");
-
-
-                /*
-                    get value for each field
-                        -if primitive, just store it to be retrieved later
-                        -if non-array object, RECURSIVELY serialize object
-                            -use object's unique id as a reference
-                            -store reference as the field in the originating object
-                            -only serialize object ONCE (beware of multiple references to same object)
-                        -if array object, serialize it
-                            -then serialize EACH ELEMENT of array
-                                -use recursion if element is an object
-                */
-                if(fieldType.isArray()){
-                    //field is array object, serialize it
-
-                    //then serialize each element (recursive if element is object)
-                }
-                else if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
-                    //field is non-array object, will serialize after storing reference as content
-                    //field object will be nested in root element, not in field
-                    String fieldObjId = Integer.toString(objMap.size());
-                    //objMap.put(f.get(obj), fieldObjId);
-                    objMap.put(fieldObjId, f.get(obj));
-                    referenceElement.addContent(fieldObjId);
-
-                    fieldElement.setContent(referenceElement);
-                    arrayFields.add(fieldElement);
-
-                }
-                else{
-                    //field is primitive/wrapper, just store value as content
-                    String fieldValue =  f.get(obj).toString();
-                    valueElement.addContent(fieldValue);
-
-                    fieldElement.setContent(valueElement);
-                    arrayFields.add(fieldElement);
-
-                }
+                Object fieldObj = f.get(obj);
+                fieldElement = serializeField(f, fieldObj, document, objMap);
+                arrayFields.add(fieldElement);
 
                 objElement.setContent(arrayFields);
 
             }
 
             //add serialized object to root element
-            rootElement.addContent(objElement);
+            //rootElement.addContent(objElement);
+            document.getRootElement().addContent(objElement);
             System.out.println("Object serialization complete, writing to file...");
 
 
@@ -168,9 +138,81 @@ public class Serializer {
             e.printStackTrace();
         }
 
-
         //return serialized object as XML Document
         return document;
+    }
+
+    private static Element serializeField(Field field, Object fieldObj, Document document, IdentityHashMap objMap){
+
+        if(!Modifier.isPublic(field.getModifiers())){
+            field.setAccessible(true);
+        }
+
+        Element fieldElement;
+
+        if(fieldObj != null){
+            fieldElement = new Element("field");
+
+            try{
+                // uniquely identify each field element (declaring class  + field name)
+                String declaringClass =  field.getDeclaringClass().getName();
+                String fieldName = field.getName();
+                fieldElement.setAttribute("name", fieldName);
+                fieldElement.setAttribute("declaringclass", declaringClass);
+
+                Element valueElement = new Element("value");
+                Element referenceElement = new Element("reference");
+
+
+                /*
+                    get value for each field
+                        -if primitive, just store it to be retrieved later
+                        -if non-array object, RECURSIVELY serialize object
+                            -use object's unique id as a reference
+                            -store reference as the field in the originating object
+                            -only serialize object ONCE (beware of multiple references to same object)
+                        -if array object, serialize it
+                            -then serialize EACH ELEMENT of array
+                                -use recursion if element is an object
+                */
+
+                Class fieldType = field.getType();
+
+                if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
+                    //field is reference to another object, will serialize that object after storing reference as content
+                    String fieldObjId = Integer.toString(objMap.size());
+                    //objMap.put(f.get(obj), fieldObjId);
+                    //objMap.put(fieldObjId, field.get(obj));
+                    objMap.put(fieldObjId, fieldObj);
+                    referenceElement.addContent(fieldObjId);
+
+                    fieldElement.setContent(referenceElement);
+                    //arrayFields.add(fieldElement);
+
+                    //recursive call
+                    serializeObject(fieldObj, document, objMap);
+
+                }
+                else{
+                    //field is primitive/wrapper, just store value as content
+                    //String fieldValue =  field.get(obj).toString();
+                    String fieldValue = fieldObj.toString();
+                    valueElement.addContent(fieldValue);
+
+                    fieldElement.setContent(valueElement);
+                    //arrayFields.add(fieldElement);
+
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        else {
+            fieldElement = new Element("null");
+        }
+
+        return fieldElement;
     }
 
 
