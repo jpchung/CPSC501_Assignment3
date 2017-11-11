@@ -17,7 +17,7 @@ public class Deserializer {
     public static Object deserialize(Document document){
 
         //Object to be instantiated via deserialization
-        Object obj;
+        Object obj = null;
 
         HashMap objMap =  new HashMap();
 
@@ -74,25 +74,12 @@ public class Deserializer {
                 // if non-array object, assign values to all fields/instance variables
                 if(objClass.isArray()){
 
-                    //get component type
+                    //set values for each array element
                     Class arrayType =  objClass.getComponentType();
                     for(int j= 0; j < objChildrenList.size(); j++){
                         Element arrayContentElement = (Element) objChildrenList.get(j);
-                        String contentType = arrayContentElement.getName();
 
-                        Object arrayContent = deserializeContentElement(arrayType, contentType, arrayContentElement, objMap);
-
-                        /*
-                        if(contentType.equals("reference")){
-                            arrayValue = objMap.get(arrayContent.getText());
-                        }
-                        else if(contentType.equals("value")){
-                            arrayValue = deserializeFieldValue(arrayType, arrayContent);
-                        }
-                        else{
-                            arrayValue = null;
-                        }
-                        */
+                        Object arrayContent = deserializeContentElement(arrayType, arrayContentElement, objMap);
 
                         Array.set(objInstance, j, arrayContent);
 
@@ -119,25 +106,8 @@ public class Deserializer {
                         //check field element content for value/reference and set accordingly
                         Class fieldType = field.getType();
                         Element fieldContentElement = (Element) fieldElement.getChildren().get(0);
-                        String contentType = fieldContentElement.getName();
 
-                        Object fieldContent = deserializeContentElement(fieldType, contentType, fieldContentElement, objMap);
-
-
-                        /*
-                        if(contentType.equals("reference")){
-                            fieldValue = objMap.get(fieldElementContent.getText());
-                        }
-                        else if(contentType.equals("value")){
-
-                            fieldValue = deserializeFieldValue(fieldType, fieldElementContent);
-                        }
-                        else{
-                            //null
-                            fieldValue = null;
-                        }
-                        */
-
+                        Object fieldContent = deserializeContentElement(fieldType, fieldContentElement, objMap);
 
                         field.set(objInstance, fieldContent);
                     }
@@ -145,48 +115,20 @@ public class Deserializer {
                 }
 
 
-            } //emd of objList loop
+            }
+            //end of loop, object list should be deserialized and instantiated
 
+            //first object in object HashMap should be main object that was serialized
+            obj = objMap.get("0");
 
         }
         catch(Exception e){
             e.printStackTrace();
         }
 
-        /*
-        For each object,
-            - create an uninitialized instance
-                - class name is attribute of object element in XML, so dynamicaly load its class w/ forName()
-            - create an instance of the class
-                - if non-array object, get declared no-arg constructor, then use newInstance()
-                    - may need to set accessible
-                - if array object, use Array.newInstance()
-                    - use getComponentType() for element type
-                    - array length is attribute of object element
-            - associate the new instance with the object's unique identifier using a table
-                - HashMap : key = id, value =  object reference
-            - assign values to all instance variables in each non-array object
-                - get list of child elements (i.e. fields) via getChildren() of Element class
-                - iterate through each field in list
-                    - get declaring class (attribute of field element)
-                    - load class dynamically with forName()
-                    - find field name (attribute of field element)
-                    - use getDeclaredField to find Field metaobject
-                    - initialize the value of the field using set()
-                        - if primitive, use stored value (via getText() and appropriate Wrapper object)
-                        - if reference, use unique identifier to find corresponding instance in table
-                            - may need to set accessible
-            - if array object
-                - find element type via getComponentType()
-                - iterate through each element of the array
-                    - set element's value using Array.set()
-                    - check if element primitive or reference and treat accordingly
-        */
 
-
-
-        //REMOVE LATER: placeholder return
-        return new Object();
+        //return deserialized object
+        return obj;
     }
 
     //get value from field element content
@@ -219,8 +161,10 @@ public class Deserializer {
         return valueObject;
     }
 
-    private static Object deserializeContentElement(Class classType, String contentType, Element contentElement, HashMap objMap){
+    private static Object deserializeContentElement(Class classType, Element contentElement, HashMap objMap){
         Object contentObject;
+
+        String contentType = contentElement.getName();
 
         if(contentType.equals("reference"))
             contentObject = objMap.get(contentElement.getText());
