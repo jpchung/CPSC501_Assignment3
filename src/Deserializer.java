@@ -77,10 +77,12 @@ public class Deserializer {
                     //get component type
                     Class arrayType =  objClass.getComponentType();
                     for(int j= 0; j < objChildrenList.size(); j++){
-                        Element arrayContent = (Element) objChildrenList.get(j);
-                        String contentType = arrayContent.getName();
+                        Element arrayContentElement = (Element) objChildrenList.get(j);
+                        String contentType = arrayContentElement.getName();
 
-                        Object arrayValue;
+                        Object arrayContent = deserializeContentElement(arrayType, contentType, arrayContentElement, objMap);
+
+                        /*
                         if(contentType.equals("reference")){
                             arrayValue = objMap.get(arrayContent.getText());
                         }
@@ -90,8 +92,9 @@ public class Deserializer {
                         else{
                             arrayValue = null;
                         }
+                        */
 
-                        Array.set(arrayContent, j, arrayValue);
+                        Array.set(objInstance, j, arrayContent);
 
                     }
                 }
@@ -115,10 +118,13 @@ public class Deserializer {
 
                         //check field element content for value/reference and set accordingly
                         Class fieldType = field.getType();
-                        Element fieldElementContent = (Element) fieldElement.getChildren().get(0);
-                        String contentType = fieldElementContent.getName();
+                        Element fieldContentElement = (Element) fieldElement.getChildren().get(0);
+                        String contentType = fieldContentElement.getName();
 
-                        Object fieldValue;
+                        Object fieldContent = deserializeContentElement(fieldType, contentType, fieldContentElement, objMap);
+
+
+                        /*
                         if(contentType.equals("reference")){
                             fieldValue = objMap.get(fieldElementContent.getText());
                         }
@@ -130,8 +136,10 @@ public class Deserializer {
                             //null
                             fieldValue = null;
                         }
+                        */
 
-                        field.set(objInstance, fieldValue);
+
+                        field.set(objInstance, fieldContent);
                     }
 
                 }
@@ -211,5 +219,18 @@ public class Deserializer {
         return valueObject;
     }
 
+    private static Object deserializeContentElement(Class classType, String contentType, Element contentElement, HashMap objMap){
+        Object contentObject;
+
+        if(contentType.equals("reference"))
+            contentObject = objMap.get(contentElement.getText());
+        else if(contentType.equals("value"))
+            contentObject = deserializeFieldValue(classType, contentElement);
+        else
+            contentObject = null;
+
+
+        return contentObject;
+    }
 
 }
