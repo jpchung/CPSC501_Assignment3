@@ -109,7 +109,7 @@ public class Deserializer {
                         }
                         else if(contentType.equals("value")){
 
-                            fieldValue = getFieldValue(fieldType, fieldElementContent);
+                            fieldValue = deserializeFieldValue(fieldType, fieldElementContent);
                         }
                         else{
                             //null
@@ -171,7 +171,7 @@ public class Deserializer {
     }
 
     //get value from field element content
-    private static Object getFieldValue(Class fieldType, Element valueElement){
+    private static Object deserializeFieldValue(Class fieldType, Element valueElement){
 
         Object valueObject = null;
 
