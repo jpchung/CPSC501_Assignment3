@@ -76,7 +76,6 @@ public class Deserializer {
 
                     //get component type
                     Class arrayType =  objClass.getComponentType();
-
                     for(int j= 0; j < objChildrenList.size(); j++){
 
                     }
@@ -99,21 +98,29 @@ public class Deserializer {
                             field.setAccessible(true);
                         }
 
-                        //set value for field
+                        //check field element content for value/reference and set accordingly
                         Class fieldType = field.getType();
-                        if(!fieldType.isArray() && !Serializer.isWrapperClass(fieldType)){
+                        Element fieldElementContent = (Element) fieldElement.getChildren().get(0);
+                        String contentType = fieldElementContent.getName();
 
+                        Object fieldValue;
+                        if(contentType.equals("reference")){
+                            fieldValue = objMap.get(fieldElementContent.getText());
+                        }
+                        else if(contentType.equals("value")){
+
+                            fieldValue = getFieldValue(fieldType, fieldElementContent);
                         }
                         else{
-
+                            //null
+                            fieldValue = null;
                         }
+
+                        field.set(objInstance, fieldValue);
+
 
 
                     }
-
-
-
-
 
 
                 }
@@ -162,4 +169,36 @@ public class Deserializer {
         //REMOVE LATER: placeholder return
         return new Object();
     }
+
+    //get value from field element content
+    private static Object getFieldValue(Class fieldType, Element valueElement){
+
+        Object valueObject = null;
+
+        if(fieldType.equals(int.class))
+            valueObject = Integer.valueOf(valueElement.getText());
+        else if(fieldType.equals(byte.class))
+            valueObject = Byte.valueOf(valueElement.getText());
+        else if(fieldType.equals(short.class))
+            valueObject = Short.valueOf(valueElement.getText());
+        else if(fieldType.equals(long.class))
+            valueObject = Long.valueOf(valueElement.getText());
+        else if(fieldType.equals(float.class))
+            valueObject = Float.valueOf(valueElement.getText());
+        else if(fieldType.equals(double.class))
+            valueObject = Double.valueOf(valueElement.getText());
+        else if(fieldType.equals(boolean.class)){
+
+            String boolString = valueElement.getText();
+
+            if(boolString.equals("true"))
+                valueObject = Boolean.TRUE;
+            else
+                valueObject = Boolean.FALSE;
+        }
+
+        return valueObject;
+    }
+
+
 }
