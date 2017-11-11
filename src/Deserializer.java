@@ -77,13 +77,28 @@ public class Deserializer {
                     //get component type
                     Class arrayType =  objClass.getComponentType();
                     for(int j= 0; j < objChildrenList.size(); j++){
+                        Element arrayContent = (Element) objChildrenList.get(j);
+                        String contentType = arrayContent.getName();
+
+                        Object arrayValue;
+                        if(contentType.equals("reference")){
+                            arrayValue = objMap.get(arrayContent.getText());
+                        }
+                        else if(contentType.equals("value")){
+                            arrayValue = deserializeFieldValue(arrayType, arrayContent);
+                        }
+                        else{
+                            arrayValue = null;
+                        }
+
+                        Array.set(arrayContent, j, arrayValue);
 
                     }
                 }
                 else{
                     //non-array object, assign values to all fields
                     for(int j = 0; j < objChildrenList.size(); j++){
-                        Element fieldElement = (Element) objChildrenList.get(i);
+                        Element fieldElement = (Element) objChildrenList.get(j);
 
                         //get declaring class (via field attribute) and load class dynamically
                         Class declaringClass =  Class.forName(fieldElement.getAttributeValue("declaringclass"));
@@ -117,16 +132,12 @@ public class Deserializer {
                         }
 
                         field.set(objInstance, fieldValue);
-
-
-
                     }
-
 
                 }
 
 
-            }
+            } //emd of objList loop
 
 
         }
