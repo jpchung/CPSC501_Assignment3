@@ -19,27 +19,37 @@ public class Sender
 
         objList =  new ArrayList<>();
 
-        //loop object selection/creation menu until user decidoes to
+        //loop object selection/creation menu until user decides to quit
         boolean quit = false;
         while(!quit){
             int objChoice = promptObjectSelection();
 
-            if(objChoice == 0){
-                System.out.println("Quitting program...");
-                System.exit(0);
+            switch(objChoice){
+                case 0:
+                    System.out.println("Quitting program...");
+                    System.exit(0);
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    createObject(objChoice);
+                    break;
+                case 6:
+                    quit = true;
+                    break;
+                case 7:
+                    //print list of created objects
+                    System.out.println(objList.toString());
+                    break;
+                default:
+                    System.out.println("Integer out of range");
+                    break;
             }
-            else if(0 < objChoice && objChoice < 6 ){
-                createObject(objChoice);
 
-            }
-            else if (objChoice == 6){
-                //quit loop and serialize
-                quit = true;
-            }
-            else{
-                System.out.println("Integer out of range");
-            }
         }
+
+        //quit loop
 
 
 
@@ -89,8 +99,8 @@ public class Sender
                 "2| ReferenceObject (object with reference to simpleObject)\n" +
                 "3| SimpleArrayObject (object with primitive int array)\n" +
                 "4| ReferenceArrayObject (object with array of references)\n" +
-                "5| CollectionObject (object using Java's Collection class)\n" +
-                "(Enter 0 to QUIT, 6 to SERIALIZE and SEND to Receiver)");
+                "5| CollectionObject (object using Java's Collection class)\n\n" +
+                "Enter 0 to QUIT\nEnter 6 to SERIALIZE and SEND object list to Receiver\nEnter 7 to show object list");
         System.out.println("======================================================");
 
         System.out.println("Enter an object to create: ");
@@ -118,6 +128,7 @@ public class Sender
                 objList.add(createReferenceObject());
                 break;
             case 3:
+                objList.add(createSimpleArrayObject());
                 break;
             case 4:
                 break;
@@ -132,10 +143,9 @@ public class Sender
 
 
     private static SimpleObject createSimpleObject(){
+        System.out.println("SimpleObject(int paramInt, double paramDouble, boolean paramBoolean)");
         SimpleObject simpleObj = null;
         try{
-
-            System.out.println("SimpleObject(int paramInt, double paramDouble, boolean paramBoolean)");
             Scanner input = new Scanner(System.in);
 
             //prompt user to set paramInt
@@ -184,6 +194,37 @@ public class Sender
         System.out.println("ReferenceObject created!");
 
         return referenceObj;
+
+    }
+
+    private static SimpleArrayObject createSimpleArrayObject(){
+        System.out.println("SimpleArrayObject(int[] paramIntArray)");
+
+        Scanner input = new Scanner(System.in);
+
+        //prompt user for size of array
+        System.out.println("Enter array length for paramIntArray");
+        while(!input.hasNextInt()){
+            input.next();
+            System.out.println("Enter a valid integer:");
+        }
+        int arrayLength  = input.nextInt();
+        int[] paramIntArray =  new int[arrayLength];
+
+        //prompt users to set values for each index
+        for(int i = 0; i < arrayLength; i++){
+
+            System.out.printf("Enter an integer for index %d:\n", i);
+            while(!input.hasNextInt()){
+                input.next();
+                System.out.println("Enter a valid integer:");
+            }
+            paramIntArray[i] = input.nextInt();
+        }
+
+        SimpleArrayObject simpleArrayObj = new SimpleArrayObject(paramIntArray);
+        System.out.println("SimpleArrayObject created!");
+        return simpleArrayObj;
 
     }
 }
