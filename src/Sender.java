@@ -64,6 +64,7 @@ public class Sender
 
     }
 
+
     private static int promptObjectSelection(){
         /*
         * Objects to be able to create:
@@ -82,17 +83,17 @@ public class Sender
         * */
 
         int objChoice;
-        System.out.println("======================================================");
-        System.out.println("\nLIST OF OBJECTS: \n" +
-                "1| SimpleObject (object with primitives)\n" +
+        System.out.println("\n======================================================");
+        System.out.println("LIST OF OBJECTS: \n" +
+                "1| SimpleObject (object with int, double, bool primitives)\n" +
                 "2| ReferenceObject (object with reference to simpleObject)\n" +
-                "3| SimpleArrayObject (object with primitive array)\n" +
+                "3| SimpleArrayObject (object with primitive int array)\n" +
                 "4| ReferenceArrayObject (object with array of references)\n" +
                 "5| CollectionObject (object using Java's Collection class)\n" +
-                "(Enter 0 to QUIT, 6 to SERIALIZE)");
+                "(Enter 0 to QUIT, 6 to SERIALIZE and SEND to Receiver)");
         System.out.println("======================================================");
 
-        System.out.print("Enter an object to create: ");
+        System.out.println("Enter an object to create: ");
 
         Scanner input = new Scanner(System.in);
 
@@ -107,14 +108,14 @@ public class Sender
 
     }
 
+
     private static void createObject(int objChoice){
         switch(objChoice){
             case 1:
                 objList.add(createSimpleObject());
                 break;
             case 2:
-                SimpleObject simpleObj =  createSimpleObject();
-                objList.add(new ReferenceObject(simpleObj));
+                objList.add(createReferenceObject());
                 break;
             case 3:
                 break;
@@ -129,9 +130,41 @@ public class Sender
 
     }
 
+
     private static SimpleObject createSimpleObject(){
         SimpleObject simpleObj = null;
         try{
+
+            System.out.println("SimpleObject(int paramInt, double paramDouble, boolean paramBoolean)");
+            Scanner input = new Scanner(System.in);
+
+            //prompt user to set paramInt
+            System.out.println("Enter an integer for paramInt: ");
+            while(!input.hasNextInt()){
+                input.next();
+                System.out.println("Enter a valid integer for paramInt:");
+            }
+            int paramInt = input.nextInt();
+
+            //prompt user to set paramDouble
+            System.out.println("Enter a double for paramDouble: ");
+            while(!input.hasNextDouble()){
+                input.next();
+                System.out.println("Enter a valid double for paramDouble");
+            }
+            double paramDouble = input.nextDouble();
+
+            //prompt user to set paramBoolean
+            System.out.println("Enter a boolean (true/false) for paramBoolean:");
+            while(!input.hasNextBoolean()){
+                input.next();
+                System.out.println("Enter a valid boolean (true/false) for paramBoolean");
+            }
+            boolean paramBoolean = input.nextBoolean();
+
+            simpleObj = new SimpleObject(paramInt, paramDouble, paramBoolean);
+            System.out.println("SimpleObject created!");
+
 
         }
         catch(Exception e){
@@ -139,6 +172,18 @@ public class Sender
         }
 
         return simpleObj;
+
+    }
+
+    private static ReferenceObject createReferenceObject(){
+        System.out.println("ReferenceObject(SimpleObject simpleObj)");
+
+        //create simpleObj to pass to referenceObj
+        SimpleObject simpleObj =  createSimpleObject();
+        ReferenceObject referenceObj = new ReferenceObject(simpleObj);
+        System.out.println("ReferenceObject created!");
+
+        return referenceObj;
 
     }
 }
