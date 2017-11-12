@@ -163,19 +163,6 @@ public class Serializer {
                 Element valueElement = new Element("value");
                 Element referenceElement = new Element("reference");
 
-
-                /*
-                    get value for each field
-                        -if primitive, just store it to be retrieved later
-                        -if non-array object, RECURSIVELY serialize object
-                            -use object's unique id as a reference
-                            -store reference as the field in the originating object
-                            -only serialize object ONCE (beware of multiple references to same object)
-                        -if array object, serialize it
-                            -then serialize EACH ELEMENT of array
-                                -use recursion if element is an object
-                */
-
                 Class fieldType = field.getType();
 
                 if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
