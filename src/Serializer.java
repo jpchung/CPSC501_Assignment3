@@ -122,23 +122,23 @@ public class Serializer {
             //add serialized object to root element
             //rootElement.addContent(objElement);
             document.getRootElement().addContent(objElement);
-            System.out.println("Object serialization complete, writing to file...");
+            //System.out.println("Object serialization complete, writing to file...");
 
 
-            //use XMLOutputter to format document as xml and write to file
-            XMLOutputter xmlOutputter = new XMLOutputter();
-            xmlOutputter.setFormat(Format.getPrettyFormat());
-            FileWriter fileWriter = new FileWriter("serializedObject.xml");
-            xmlOutputter.output(document, fileWriter);
+            //TO MOVE: use XMLOutputter to format document as xml and write to file
+            //XMLOutputter xmlOutputter = new XMLOutputter();
+            //xmlOutputter.setFormat(Format.getPrettyFormat());
+            //FileWriter fileWriter = new FileWriter("serializedObject.xml");
+            //xmlOutputter.output(document, fileWriter);
 
-            System.out.println("Writing to file complete!");
+            //System.out.println("Writing to file complete!");
 
         }
         catch(Exception e){
             e.printStackTrace();
         }
 
-        //return serialized object as XML Document
+        //return serialized object as Document
         return document;
     }
 

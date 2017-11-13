@@ -7,6 +7,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import org.jdom.*;
+import org.jdom.output.*;
 
 public class Sender
 {
@@ -14,7 +16,7 @@ public class Sender
     private static ArrayList<Object> objList;
 
     public static void main(String[] args){
-        String ipAddress = "127.0.0.1"; //localhost
+        String host = "localhost";
         int port = 8000;
 
         objList =  new ArrayList<>();
@@ -49,48 +51,16 @@ public class Sender
 
         }
 
-        //quit loop
+        //quit loop when done creating objects and want to serialize/send
+        serializeObjects(host, port);
 
 
 
-        try{
-            System.out.println("Connecting to Server " + ipAddress + "on port: " + port);
-
-            Socket client = new Socket(ipAddress, port);
-            System.out.println("Sender (Client) connected to " + client.getRemoteSocketAddress());
-
-            DataOutputStream outputStream = new DataOutputStream(client.getOutputStream());
-            //REPLACE LATER: send xml document from client to Server instead of string message
-            outputStream.writeUTF("String message to Server from Sender (Client)");
-
-            DataInputStream inputStream =  new DataInputStream(client.getInputStream());
-            System.out.println("Server message: " + inputStream.readUTF());
-
-            client.close();
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
 
     }
 
 
     private static int promptObjectSelection(){
-        /*
-        * Objects to be able to create:
-        *   - simple object with primitive instance variables
-        *       - field values should be settable by user
-        *   - object containing reference to other objects
-        *       - referenced objects must be created at same time
-        *       - primitives should be settable by user
-        *       - deal with circular references
-        *   - object with array of primitives
-        *       - allow user to set values for array elements to arbitrary values
-        *   - object with array of object references
-        *       - referenced objects must be created at same time
-        *   - object that uses an instance of one of Java's collection classes that refer multiple objects
-        *       - referenced objects must be created at same time
-        * */
 
         int objChoice;
         System.out.println("\n======================================================");
@@ -109,6 +79,7 @@ public class Sender
 
         Scanner input = new Scanner(System.in);
 
+        //check valid int input
         while(!input.hasNextInt()){
             input.next();
             System.out.println("Enter a valid integer:");
@@ -207,7 +178,7 @@ public class Sender
         Scanner input = new Scanner(System.in);
 
         //prompt user for size of array
-        System.out.println("Enter array length for paramIntArray");
+        System.out.println("Enter array length for paramIntArray:");
         while(!input.hasNextInt()){
             input.next();
             System.out.println("Enter a valid integer:");
@@ -292,6 +263,78 @@ public class Sender
 
         System.out.println("CollectionObject created!");
         return collectionObj;
+
+    }
+
+    private static File createXMLFile(Document document) {
+        File file = new File("serializedObject.xml");
+        try{
+            XMLOutputter xmlOutputter = new XMLOutputter();
+            xmlOutputter.setFormat(Format.getPrettyFormat());
+            FileWriter fileWriter = new FileWriter(file);
+            xmlOutputter.output(document, fileWriter);
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return file;
+
+    }
+
+    private static void sendFile(String host, int port, File file){
+        try{
+            System.out.println("Connecting to " + host + "on port: " + port);
+
+            //create socket to send file
+            Socket socket = new Socket(host, port);
+            System.out.println("Sender connected to " + socket.getRemoteSocketAddress());
+
+            //open io streams
+            OutputStream outputStream = socket.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(file);
+
+            //send file as byte array stream
+            byte[] fileBytes = new byte[1024 * 1024];
+            int bytesRead = 0;
+            while((bytesRead = fileInputStream.read(fileBytes))> 0){
+                outputStream.write(fileBytes, 0, bytesRead);
+            }
+
+            //close streams/sockets
+            fileInputStream.close();
+            outputStream.close();
+            socket.close();
+
+            System.out.println("File sent!");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void serializeObjects(String host, int port){
+        //serialize and send created objects list
+        for(Object obj : objList){
+            try{
+                System.out.println("Serializing object...");
+                Document document  = Serializer.serialize(obj);
+
+                System.out.println("Creating file...");
+                File file = createXMLFile(document);
+
+                System.out.println("Sending file...");
+                sendFile(host, port, file);
+
+
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }
+
 
     }
 }
