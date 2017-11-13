@@ -44,6 +44,7 @@ public class Receiver extends Thread {
                     fileOutputStream.write(fileBytes, 0, bytesRead);
                     break;
                 }
+                System.out.println("received file!");
 
                 //build object from file
                 //deserialize XML document with SAXBuilder to build objects

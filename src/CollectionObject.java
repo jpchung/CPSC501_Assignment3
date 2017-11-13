@@ -8,6 +8,9 @@ public class CollectionObject {
 
     private ArrayList fieldCollection;
 
+    //no-arg constructor (need for Deserializer)
+    public CollectionObject(){}
+
     public CollectionObject(ArrayList paramCollection){
         fieldCollection = paramCollection;
     }

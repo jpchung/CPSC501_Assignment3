@@ -6,6 +6,9 @@ public class SimpleArrayObject {
 
     private int[] fieldIntArray;
 
+    //no-arg constructor (need for Deserializer)
+    public SimpleArrayObject(){}
+
     public SimpleArrayObject(int[] paramIntArray){
         fieldIntArray = paramIntArray;
     }
