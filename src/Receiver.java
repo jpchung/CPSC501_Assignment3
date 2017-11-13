@@ -5,9 +5,11 @@
 
 import java.io.*;
 import java.net.*;
+import org.jdom.*;
+import org.jdom.input.*;
 public class Receiver extends Thread {
 
-    private Socket server;
+    private Socket socket;
     private ServerSocket serverSocket;
 
     public Receiver(int port){
@@ -25,16 +27,35 @@ public class Receiver extends Thread {
         while(true){
             try{
                 System.out.println("Receiver (Server) running on " + serverSocket.getLocalPort());
-                server = serverSocket.accept();
 
-                System.out.println("Receiver (Server) connected to " + server.getRemoteSocketAddress());
+                socket = serverSocket.accept();
+                System.out.println("Receiver (Server) connected to " + socket.getRemoteSocketAddress());
 
-                DataInputStream inputStream = new DataInputStream(server.getInputStream());
+                File file =  new File("serializedObject.xml");
 
-                DataOutputStream outputStream = new DataOutputStream(server.getOutputStream());
-                System.out.println("Closing Reciever (Server)...");
+                //io streams
+                InputStream inputStream = socket.getInputStream();
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-                server.close();
+                //receive file from Sender client as byte array
+                byte[] fileBytes = new byte[1024 * 1024];
+                int bytesRead = 0;
+                while((bytesRead =  inputStream.read(fileBytes)) > 0){
+                    fileOutputStream.write(fileBytes, 0, bytesRead);
+                    break;
+                }
+
+                //build object from file
+                //deserialize XML document with SAXBuilder to build objects
+                SAXBuilder saxBuilder = new SAXBuilder();
+                Document document = (Document)saxBuilder.build(file);
+                Object obj = Deserializer.deserialize(document);
+
+                //visualize object (INSPECTOR FROM ASSIGNMENT 2)
+
+
+
+                socket.close();
             }
             catch (Exception e){
                 e.printStackTrace();

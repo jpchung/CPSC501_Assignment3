@@ -54,9 +54,6 @@ public class Sender
         //quit loop when done creating objects and want to serialize/send
         serializeObjects(host, port);
 
-
-
-
     }
 
 
@@ -326,7 +323,6 @@ public class Sender
 
                 System.out.println("Sending file...");
                 sendFile(host, port, file);
-
 
             }
             catch(Exception e){
