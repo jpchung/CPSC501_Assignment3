@@ -31,7 +31,7 @@ public class Receiver extends Thread {
                 socket = serverSocket.accept();
                 System.out.println("Receiver (Server) connected to " + socket.getRemoteSocketAddress());
 
-                File file =  new File("serializedObject.xml");
+                File file =  new File("receivedFile.xml");
 
                 //io streams
                 InputStream inputStream = socket.getInputStream();
@@ -48,10 +48,13 @@ public class Receiver extends Thread {
                 //build object from file
                 //deserialize XML document with SAXBuilder to build objects
                 SAXBuilder saxBuilder = new SAXBuilder();
-                Document document = (Document)saxBuilder.build(file);
+                Document document = (Document) saxBuilder.build(file);
                 Object obj = Deserializer.deserialize(document);
 
-                //visualize object (INSPECTOR FROM ASSIGNMENT 2)
+                //visualize object (via reflective Inspector class)
+                //Inspector inspectorGadget = new Inspector();
+                //inspectorGadget.inspect(obj, false);
+
 
 
 

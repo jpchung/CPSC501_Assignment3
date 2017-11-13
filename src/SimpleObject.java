@@ -6,14 +6,14 @@ public class SimpleObject {
 
     private int fieldInt;
     private double fieldDouble;
-    private boolean fieldBoolean;
+    //private boolean fieldBoolean;
 
 
 
-    public SimpleObject(int paramInt, double paramDouble, boolean paramBoolean){
+    public SimpleObject(int paramInt, double paramDouble){
         fieldInt =  paramInt;
         fieldDouble =  paramDouble;
-        fieldBoolean = paramBoolean;
+        //fieldBoolean = paramBoolean;
     }
 
 

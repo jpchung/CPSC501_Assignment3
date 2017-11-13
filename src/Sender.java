@@ -137,14 +137,15 @@ public class Sender
             double paramDouble = input.nextDouble();
 
             //prompt user to set paramBoolean
+            /*
             System.out.println("Enter a boolean (true/false) for paramBoolean:");
             while(!input.hasNextBoolean()){
                 input.next();
                 System.out.println("Enter a valid boolean (true/false) for paramBoolean");
             }
             boolean paramBoolean = input.nextBoolean();
-
-            simpleObj = new SimpleObject(paramInt, paramDouble, paramBoolean);
+            */
+            simpleObj = new SimpleObject(paramInt, paramDouble);
             System.out.println("SimpleObject created!");
 
 
@@ -264,12 +265,15 @@ public class Sender
     }
 
     private static File createXMLFile(Document document) {
-        File file = new File("serializedObject.xml");
+        File file = new File("sentFile.xml");
         try{
             XMLOutputter xmlOutputter = new XMLOutputter();
             xmlOutputter.setFormat(Format.getPrettyFormat());
             FileWriter fileWriter = new FileWriter(file);
-            xmlOutputter.output(document, fileWriter);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            xmlOutputter.output(document, bufferedWriter);
+
+            bufferedWriter.close();
 
         }
         catch(Exception e){
@@ -281,7 +285,7 @@ public class Sender
 
     private static void sendFile(String host, int port, File file){
         try{
-            System.out.println("Connecting to " + host + "on port: " + port);
+            System.out.println("Connecting to " + host + " on port: " + port);
 
             //create socket to send file
             Socket socket = new Socket(host, port);
@@ -317,6 +321,13 @@ public class Sender
             try{
                 System.out.println("Serializing object...");
                 Document document  = Serializer.serialize(obj);
+
+                System.out.println("checking document...");
+                Element rootElement = document.getRootElement();
+                System.out.println(rootElement.getName());
+                Element objElement = rootElement.getChild("object");
+                System.out.println(objElement.getName());
+                System.out.println(objElement.getChildren());
 
                 System.out.println("Creating file...");
                 File file = createXMLFile(document);

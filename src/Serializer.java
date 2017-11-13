@@ -24,10 +24,10 @@ public class Serializer {
 
         IdentityHashMap objMap = new IdentityHashMap<>();
 
-        Document serializedDocument = serializeObject(obj, document, objMap);
+        //Document serializedDocument = serializeObject(obj, document, objMap);
 
-        return serializedDocument;
-
+        //return serializedDocument;
+        return serializeObject(obj, document, objMap);
     }
 
 
@@ -50,15 +50,16 @@ public class Serializer {
 
         try {
             //give object unique identifier
-            //IdentityHashMap objMap = new IdentityHashMap<>();
+
             String objId = Integer.toString(objMap.size()); //use index/size of IdHashMap as id for each object
-            //objMap.put(obj, objId);
             objMap.put(objId, obj);
 
             //create object element (nested within root element) with class and id attributes
             objElement = new Element("object");
             objElement.setAttribute("class", objClass.getName());
             objElement.setAttribute("id", objId);
+            document.getRootElement().addContent(objElement);
+
 
 
             /* */
@@ -100,38 +101,32 @@ public class Serializer {
                 objElement.setContent(elementContents);
 
             }
+            else{
+                System.out.println("Serializing fields...");
+                //get list of all object fields
+                Field objFields[] = objClass.getDeclaredFields();
 
-            System.out.println("Serializing fields...");
-            //get list of all object fields
-            Field objFields[] = objClass.getDeclaredFields();
+                for (Field f : objFields){
 
-            for (Field f : objFields){
+                    if(!Modifier.isPublic(f.getModifiers())){
+                        f.setAccessible(true);
+                    }
 
-                if(!Modifier.isPublic(f.getModifiers())){
-                    f.setAccessible(true);
+                    Object fieldObj = f.get(obj);
+                    fieldElement = serializeField(f, fieldObj, document, objMap);
+                    //arrayFields.add(fieldElement);
+                    System.out.println(f.getName());
+
+
+                    //objElement.addContent(arrayFields);
+                    objElement.addContent(fieldElement);
+
                 }
-
-                Object fieldObj = f.get(obj);
-                fieldElement = serializeField(f, fieldObj, document, objMap);
-                arrayFields.add(fieldElement);
-
-                objElement.setContent(arrayFields);
-
             }
 
             //add serialized object to root element
             //rootElement.addContent(objElement);
-            document.getRootElement().addContent(objElement);
-            //System.out.println("Object serialization complete, writing to file...");
 
-
-            //TO MOVE: use XMLOutputter to format document as xml and write to file
-            //XMLOutputter xmlOutputter = new XMLOutputter();
-            //xmlOutputter.setFormat(Format.getPrettyFormat());
-            //FileWriter fileWriter = new FileWriter("serializedObject.xml");
-            //xmlOutputter.output(document, fileWriter);
-
-            //System.out.println("Writing to file complete!");
 
         }
         catch(Exception e){
@@ -208,16 +203,15 @@ public class Serializer {
         boolean isWrapper = false;
 
         try {
-            Object objInstance = objClass.newInstance();
-
-            if (objInstance instanceof Integer ||
-                    objInstance instanceof Float ||
-                    objInstance instanceof Long ||
-                    objInstance instanceof Short ||
-                    objInstance instanceof Byte ||
-                    objInstance instanceof Double ||
-                    objInstance instanceof Boolean)
+            if(objClass.equals(int.class) ||
+                    objClass.equals(byte.class) ||
+                    objClass.equals(short.class) ||
+                    objClass.equals(long.class) ||
+                    objClass.equals(float.class) ||
+                    objClass.equals(double.class) ||
+                    objClass.equals(boolean.class))
                 isWrapper = true;
+
         }
         catch (Exception e){
             e.printStackTrace();
