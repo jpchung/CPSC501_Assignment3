@@ -96,11 +96,13 @@ public class Sender
         System.out.println("\n======================================================");
         System.out.println("LIST OF OBJECTS: \n" +
                 "1| SimpleObject (object with int, double, bool primitives)\n" +
-                "2| ReferenceObject (object with reference to simpleObject)\n" +
+                "2| ReferenceObject (object with field reference to SimpleObject)\n" +
                 "3| SimpleArrayObject (object with primitive int array)\n" +
-                "4| ReferenceArrayObject (object with array of references)\n" +
+                "4| ReferenceArrayObject (object with array of SimpleObject references)\n" +
                 "5| CollectionObject (object using Java's Collection class)\n\n" +
-                "Enter 0 to QUIT\nEnter 6 to SERIALIZE and SEND object list to Receiver\nEnter 7 to show object list");
+                "Enter 0 to QUIT" +
+                "\nEnter 6 to SERIALIZE and SEND object list to Receiver" +
+                "\nEnter 7 to SHOW LIST of created objects");
         System.out.println("======================================================");
 
         System.out.println("Enter an object to create: ");
@@ -109,7 +111,7 @@ public class Sender
 
         while(!input.hasNextInt()){
             input.next();
-            System.out.print("Enter a valid integer:");
+            System.out.println("Enter a valid integer:");
         }
 
         objChoice = input.nextInt();
@@ -131,8 +133,10 @@ public class Sender
                 objList.add(createSimpleArrayObject());
                 break;
             case 4:
+                objList.add(createRefArrayObject());
                 break;
             case 5:
+                objList.add(createCollectionObject());
                 break;
             default:
                 break;
@@ -225,6 +229,69 @@ public class Sender
         SimpleArrayObject simpleArrayObj = new SimpleArrayObject(paramIntArray);
         System.out.println("SimpleArrayObject created!");
         return simpleArrayObj;
+
+    }
+
+
+
+    private static ReferenceArrayObject createRefArrayObject(){
+        System.out.println("ReferenceArrayObject(Object[] paramObjArray)");
+
+        Scanner input = new Scanner(System.in);
+
+        //prompt user for size of array
+        System.out.println("Enter array length for paramObjArray");
+        while(!input.hasNextInt()){
+            input.next();
+            System.out.println("Enter a valid integer:");
+        }
+        int arrayLength  = input.nextInt();
+
+        Object[] paramObjArray = new Object[arrayLength];
+
+        //instantiate array with simpleObjects
+        for(int i = 0; i < arrayLength; i++){
+            System.out.printf("index %d:\n", i);
+            SimpleObject simpleObj =  createSimpleObject();
+            paramObjArray[i] = simpleObj;
+        }
+
+        ReferenceArrayObject refArrayObj = new ReferenceArrayObject(paramObjArray);
+        System.out.println("ReferenceArrayObject created!");
+        return refArrayObj;
+
+    }
+
+
+    private static CollectionObject createCollectionObject(){
+        System.out.println("CollectionObject(ArrayList paramCollection)");
+
+        Scanner input = new Scanner(System.in);
+
+        CollectionObject collectionObj = null;
+        ArrayList<SimpleObject> paramCollection = new ArrayList<>();
+        //continue adding to collection until user decides to quit
+        boolean quit = false;
+        while(!quit){
+
+            System.out.println("Add an object to the collection (yes/no)?");
+            String collectionChoice = input.nextLine();
+            if(collectionChoice.equalsIgnoreCase("yes")){
+                SimpleObject simpleObj =  createSimpleObject();
+                paramCollection.add(simpleObj);
+            }
+            else if(collectionChoice.equalsIgnoreCase("no")){
+                collectionObj = new CollectionObject(paramCollection);
+                quit = true;
+            }
+            else{
+                System.out.println("Invalid input. Enter yes or no.");
+            }
+
+        }
+
+        System.out.println("CollectionObject created!");
+        return collectionObj;
 
     }
 }
