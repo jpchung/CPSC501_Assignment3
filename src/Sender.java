@@ -319,6 +319,12 @@ public class Sender
         //serialize and send created objects list
         for(Object obj : objList){
             try{
+                Class objClass = obj.getClass();
+                System.out.println("************************************************\n");
+                System.out.printf("Press ENTER to serialize %s...\n", objClass.getName());
+                Scanner input = new Scanner(System.in);
+                input.nextLine();
+
                 System.out.println("Serializing object...");
                 Document document  = Serializer.serialize(obj);
 

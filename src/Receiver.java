@@ -53,8 +53,10 @@ public class Receiver extends Thread {
                 Object obj = Deserializer.deserialize(document);
 
                 //visualize object (via reflective Inspector class)
-                //Inspector inspectorGadget = new Inspector();
-                //inspectorGadget.inspect(obj, false);
+                System.out.println("\n======================================================");
+                Inspector inspectorGadget = new Inspector();
+                inspectorGadget.inspect(obj, false);
+                System.out.println("\n======================================================");
 
 
 
