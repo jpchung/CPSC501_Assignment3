@@ -8,11 +8,9 @@
  * <p/> JDOM Output: http://www.jdom.org/docs/apidocs.1.1/org/jdom/output/package-summary.html
  */
 
-import java.io.FileWriter;
+
 import java.lang.reflect.*;
 import org.jdom.*;
-import org.jdom.output.*;
-
 import java.util.*;
 
 public class Serializer {
@@ -65,7 +63,7 @@ public class Serializer {
                 Class arrayType = objClass.getComponentType();
 
                 for(int i=0; i < Array.getLength(obj); i++){
-                    if(arrayType.isPrimitive() || isWrapperClass(arrayType)){
+                    if(arrayType.isPrimitive()){
                         valueElement = new Element("value");
                         String elementValue =  String.valueOf(Array.get(obj, i));
                         valueElement.addContent(elementValue);
@@ -144,7 +142,7 @@ public class Serializer {
 
                 Class fieldType = field.getType();
 
-                if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
+                if(!fieldType.isPrimitive()){
                     //field is reference to another object, will serialize that object after storing reference as content
                     String fieldObjId = Integer.toString(objMap.size());
                     //objMap.put(fieldObjId, fieldObj);
@@ -179,25 +177,4 @@ public class Serializer {
     }
 
 
-
-    public static boolean isWrapperClass(Class objClass){
-        boolean isWrapper = false;
-
-        try {
-            if(objClass.equals(int.class) ||
-                    objClass.equals(byte.class) ||
-                    objClass.equals(short.class) ||
-                    objClass.equals(long.class) ||
-                    objClass.equals(float.class) ||
-                    objClass.equals(double.class) ||
-                    objClass.equals(boolean.class))
-                isWrapper = true;
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return isWrapper;
-    }
 }
