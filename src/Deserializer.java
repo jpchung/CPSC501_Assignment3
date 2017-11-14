@@ -80,7 +80,6 @@ public class Deserializer {
         String contentType = contentElement.getName();
 
         if(contentType.equals("reference")){
-            System.out.println("reference");
             contentObject = objMap.get(contentElement.getText());
         }
         else if(contentType.equals("value"))
@@ -175,6 +174,11 @@ public class Deserializer {
 
                         if(!Modifier.isPublic(field.getModifiers())){
                             field.setAccessible(true);
+
+                            //in case field also has final modifier, reset modifiers field with bitwise negation
+                            Field modifiersField = Field.class.getDeclaredField("modifiers");
+                            modifiersField.setAccessible(true);
+                            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
                         }
 
                         //check field element content for value/reference and set accordingly
