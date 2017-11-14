@@ -15,7 +15,7 @@ public class Receiver extends Thread {
     public Receiver(int port){
         try{
             serverSocket = new ServerSocket(port);
-            serverSocket.setSoTimeout(100000);
+            serverSocket.setSoTimeout(200000);
         }
         catch(Exception e){
             e.printStackTrace();

@@ -24,17 +24,12 @@ public class Serializer {
 
         IdentityHashMap objMap = new IdentityHashMap<>();
 
-        //Document serializedDocument = serializeObject(obj, document, objMap);
-
-        //return serializedDocument;
         return serializeObject(obj, document, objMap);
     }
 
 
     private static Document serializeObject(Object obj, Document document, IdentityHashMap objMap){
 
-        //Element rootElement = new Element("serialized");
-        //Document document = new Document(rootElement);
         Element objElement;
         Element fieldElement;
         Element valueElement;
@@ -43,14 +38,12 @@ public class Serializer {
         ArrayList<Element> elementContents = new ArrayList<>();
         ArrayList<Element> arrayValues = new ArrayList<>();
         ArrayList<Element> arrayReferences = new ArrayList<>();
-        ArrayList<Element> arrayFields = new ArrayList<>();
-
+        //ArrayList<Element> arrayFields = new ArrayList<>();
 
         Class objClass = obj.getClass();
 
         try {
             //give object unique identifier
-
             String objId = Integer.toString(objMap.size()); //use index/size of IdHashMap as id for each object
             objMap.put(objId, obj);
 
@@ -61,8 +54,6 @@ public class Serializer {
             document.getRootElement().addContent(objElement);
 
 
-
-            /* */
             //check if object is array type (in cases of recursive call))
             if(objClass.isArray()){
                 //add additional length attribute to object element
@@ -86,10 +77,7 @@ public class Serializer {
                     else {
                         referenceElement = new Element("reference");
                         //store object id of array element as content for reference element
-                        //also add to object identity hashmap
                         String arrayObjId = Integer.toString(objMap.size());
-                        //objMap.put(Array.get(obj, i), arrayObjId);
-                        objMap.put(arrayObjId, Array.get(obj, i));
                         referenceElement.addContent(arrayObjId);
 
                         arrayReferences.add(referenceElement);
@@ -123,10 +111,6 @@ public class Serializer {
 
                 }
             }
-
-            //add serialized object to root element
-            //rootElement.addContent(objElement);
-
 
         }
         catch(Exception e){
@@ -163,9 +147,7 @@ public class Serializer {
                 if(!fieldType.isPrimitive() && !isWrapperClass(fieldType)){
                     //field is reference to another object, will serialize that object after storing reference as content
                     String fieldObjId = Integer.toString(objMap.size());
-                    //objMap.put(f.get(obj), fieldObjId);
-                    //objMap.put(fieldObjId, field.get(obj));
-                    objMap.put(fieldObjId, fieldObj);
+                    //objMap.put(fieldObjId, fieldObj);
                     referenceElement.addContent(fieldObjId);
 
                     fieldElement.setContent(referenceElement);
@@ -177,7 +159,6 @@ public class Serializer {
                 }
                 else{
                     //field is primitive/wrapper, just store value as content
-                    //String fieldValue =  field.get(obj).toString();
                     String fieldValue = fieldObj.toString();
                     valueElement.addContent(fieldValue);
 
