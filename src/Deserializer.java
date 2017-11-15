@@ -5,15 +5,19 @@
  * References:
  * <p/> JDOM Document,Element: http://www.jdom.org/docs/apidocs.1.1/
  * <p/> JDOM input: http://www.jdom.org/docs/apidocs.1.1/org/jdom/input/package-summary.html
+ * <p/> final modifier: https://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
  */
 
 import java.lang.reflect.*;
 import org.jdom.*;
-import org.jdom.input.*;
-import java.io.*;
 import java.util.*;
 public class Deserializer {
 
+    /**
+     * Deserialize document and build object from from document contents
+     * @param document - Document of serialized object, to now be deserialized
+     * @return deserialized object
+     */
     public static Object deserialize(Document document){
         //get root element and list of nested object elements
         Element rootElement = document.getRootElement();
@@ -44,7 +48,13 @@ public class Deserializer {
         return obj;
     }
 
-    //get value from field element content
+
+    /**
+     * Deserialize value from field element content
+     * @param fieldType class type of field element
+     * @param valueElement element containing field value
+     * @return
+     */
     private static Object deserializeFieldValue(Class fieldType, Element valueElement){
 
         Object valueObject = null;
@@ -74,6 +84,13 @@ public class Deserializer {
         return valueObject;
     }
 
+    /**
+     * General method for deserializing a content element into an object
+     * @param classType - type of content element class
+     * @param contentElement - element that is content of another element
+     * @param objMap - HashMap of deserialized objects
+     * @return
+     */
     private static Object deserializeContentElement(Class classType, Element contentElement, HashMap objMap){
         Object contentObject;
 
@@ -91,6 +108,11 @@ public class Deserializer {
         return contentObject;
     }
 
+    /**
+     * Create instances for all object elements from Document
+     * @param objList - list of object elements from Document
+     * @param objMap - HashMap of deserialized objects
+     */
     private static void createObjectInstances(List objList, HashMap objMap){
         for(int i =0; i < objList.size(); i++){
             try{
@@ -133,6 +155,11 @@ public class Deserializer {
 
     }
 
+    /**
+     * set values for fields using field element attributes from Document
+     * @param objList - list of objects from Document
+     * @param objMap - HashMap of deserialized objects
+     */
     private static void setFieldValues(List objList, HashMap objMap){
         for(int i =0; i < objList.size(); i++){
             try{

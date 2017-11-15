@@ -2,6 +2,10 @@
  * Sender Client class for network connection b/w Sender and Receiver.
  * Sends serialized object as xml document to Server
  * @author Johnny Chung
+ * References:
+ * <p/> Sending files over socket connection: https://stackoverflow.com/questions/9520911/java-sending-and-receiving-file-byte-over-sockets
+ * <p/> JDOM output: http://www.jdom.org/docs/apidocs.1.1/org/jdom/output/XMLOutputter.html
+ * <p/> JDOM Document, Element: http://www.jdom.org/docs/apidocs.1.1/
  */
 
 import java.io.*;
@@ -15,6 +19,10 @@ public class Sender
 
     private static ArrayList<Object> objList;
 
+    /**
+     * Main class for running Sender
+     * @param args
+     */
     public static void main(String[] args){
         String host = "localhost";
         int port = 8000;
@@ -57,6 +65,10 @@ public class Sender
     }
 
 
+    /**
+     * Method for displaying Object menu and prompting user for a selection
+     * @return int typeCode for object choice
+     */
     private static int promptObjectSelection(){
 
         int objChoice;
@@ -89,6 +101,10 @@ public class Sender
     }
 
 
+    /**
+     * Method to create a user specified Object (based on menu from promptUserSelection)
+     * @param objChoice - int typecode for what kind of object to create
+     */
     private static void createObject(int objChoice){
         switch(objChoice){
             case 1:
@@ -114,6 +130,10 @@ public class Sender
     }
 
 
+    /**
+     * Create an instance of SimpleObject class, with user input for setting primitive fields
+     * @return instance of SimpleObject
+     */
     private static SimpleObject createSimpleObject(){
         System.out.println("SimpleObject(int paramInt, double paramDouble, boolean paramBoolean)");
         SimpleObject simpleObj = null;
@@ -136,15 +156,6 @@ public class Sender
             }
             double paramDouble = input.nextDouble();
 
-            //prompt user to set paramBoolean
-            /*
-            System.out.println("Enter a boolean (true/false) for paramBoolean:");
-            while(!input.hasNextBoolean()){
-                input.next();
-                System.out.println("Enter a valid boolean (true/false) for paramBoolean");
-            }
-            boolean paramBoolean = input.nextBoolean();
-            */
             simpleObj = new SimpleObject(paramInt, paramDouble);
             System.out.println("SimpleObject created!");
 
@@ -158,6 +169,10 @@ public class Sender
 
     }
 
+    /**
+     * Create an instance of ReferenceObject class
+     * @return instance of ReferenceObject
+     */
     private static ReferenceObject createReferenceObject(){
         System.out.println("ReferenceObject(SimpleObject simpleObj)");
 
@@ -170,6 +185,10 @@ public class Sender
 
     }
 
+    /**
+     * Create instance of SimpleArrayObject class, with user input for setting array field length and int elements
+     * @return instance of SimpleArrayObject
+     */
     private static SimpleArrayObject createSimpleArrayObject(){
         System.out.println("SimpleArrayObject(int[] paramIntArray)");
 
@@ -201,8 +220,10 @@ public class Sender
 
     }
 
-
-
+    /**
+     * Create instance of ReferenceArrayObject class, with user input for object array length, and SimpleObject fields
+     * @return instance of ReferenceArrayObject
+     */
     private static ReferenceArrayObject createRefArrayObject(){
         System.out.println("ReferenceArrayObject(Object[] paramObjArray)");
 
@@ -232,6 +253,10 @@ public class Sender
     }
 
 
+    /**
+     * Create instance of CollectionObject class, with user input per object added
+     * @return instance of CollectionObject
+     */
     private static CollectionObject createCollectionObject(){
         System.out.println("CollectionObject(ArrayList paramCollection)");
 
@@ -264,6 +289,11 @@ public class Sender
 
     }
 
+    /**
+     * Create XML file from document of serialized object
+     * @param document - Document of serialized object
+     * @return formatted XML file
+     */
     private static File createXMLFile(Document document) {
         File file = new File("sentFile.xml");
         try{
@@ -283,6 +313,12 @@ public class Sender
 
     }
 
+    /**
+     * Send the file of serialized object over network connection to Receiver
+     * @param host - name of host address
+     * @param port - port number
+     * @param file - file to send
+     */
     private static void sendFile(String host, int port, File file){
         try{
             System.out.println("Connecting to " + host + " on port: " + port);
@@ -315,6 +351,11 @@ public class Sender
 
     }
 
+    /**
+     * Serialize list of objects created by user, and send individual documents for each serialized object
+     * @param host - name of host address
+     * @param port - port number
+     */
     private static void serializeObjects(String host, int port){
         //serialize and send created objects list
         for(Object obj : objList){

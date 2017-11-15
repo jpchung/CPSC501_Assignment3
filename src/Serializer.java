@@ -15,6 +15,11 @@ import java.util.*;
 
 public class Serializer {
 
+    /**
+     * Serializes input Object into a Document to be output as an XML file and sent over a network connection
+     * @param obj - Object to serialize
+     * @return Document of serialized object
+     */
     public static Document serialize(Object obj){
         //initialize Document with root element (tag name: serialized)
         Element rootElement = new Element("serialized");
@@ -26,6 +31,13 @@ public class Serializer {
     }
 
 
+    /**
+     * Helper method for Object serialization
+     * @param obj - Object to be serialized
+     * @param document - Document to serialize into
+     * @param objMap - IdentityHashMap of serialized objects
+     * @return
+     */
     private static Document serializeObject(Object obj, Document document, IdentityHashMap objMap){
 
         Element objElement;
@@ -118,6 +130,14 @@ public class Serializer {
         return document;
     }
 
+    /**
+     * serialize the fields of Object to be serialized
+     * @param field - field class to serialize
+     * @param fieldObj - object instance of field to serialize
+     * @param document - document to serialize objects into
+     * @param objMap - IdentityHashMap of serialized objects
+     * @return Element of serialized field to add to Document
+     */
     private static Element serializeField(Field field, Object fieldObj, Document document, IdentityHashMap objMap){
 
         if(!Modifier.isPublic(field.getModifiers())){

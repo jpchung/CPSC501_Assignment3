@@ -1,6 +1,6 @@
 /**
  * Receiver Server class for network connection b/w Sender and Receiver.
- * Receives xml document from Client for deserialization
+ * Receives xml document from Sender (Client) for deserialization and visualization
  */
 
 import java.io.*;
@@ -12,6 +12,10 @@ public class Receiver extends Thread {
     private Socket socket;
     private ServerSocket serverSocket;
 
+    /**
+     * Constructor to initialize server socket and timeout
+     * @param port oort number
+     */
     public Receiver(int port){
         try{
             serverSocket = new ServerSocket(port);
@@ -22,6 +26,10 @@ public class Receiver extends Thread {
         }
     }
 
+    /**
+     * Override the Thread run method, will be what each serverThread executes.
+     * Receives file from Sender, deserializes it into a Document, then builds and visualizes object
+     */
     public void run(){
 
         while(true){
@@ -58,7 +66,7 @@ public class Receiver extends Thread {
                 inspectorGadget.inspect(obj, false);
                 System.out.println("\n======================================================");
 
-
+                //close socket
                 socket.close();
             }
             catch (Exception e){
@@ -68,6 +76,10 @@ public class Receiver extends Thread {
         }
     }
 
+    /**
+     * main method for running Receiver
+     * @param args
+     */
     public static void main(String[] args){
         int port = 8000;
 

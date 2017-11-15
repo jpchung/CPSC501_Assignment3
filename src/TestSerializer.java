@@ -5,12 +5,9 @@
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import java.io.FileWriter;
-import java.lang.reflect.*;
 import java.util.*;
-
 import org.jdom.*;
-import org.jdom.output.*;
+
 public class TestSerializer {
 
     @Test
