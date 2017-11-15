@@ -103,7 +103,6 @@ public class Serializer {
                     //arrayFields.add(fieldElement);
                     System.out.println(f.getName());
 
-
                     //objElement.addContent(arrayFields);
                     objElement.addContent(fieldElement);
 
@@ -145,9 +144,7 @@ public class Serializer {
                 if(!fieldType.isPrimitive()){
                     //field is reference to another object, will serialize that object after storing reference as content
                     String fieldObjId = Integer.toString(objMap.size());
-                    //objMap.put(fieldObjId, fieldObj);
                     referenceElement.addContent(fieldObjId);
-
                     fieldElement.setContent(referenceElement);
                     //arrayFields.add(fieldElement);
 
@@ -159,7 +156,6 @@ public class Serializer {
                     //field is primitive/wrapper, just store value as content
                     String fieldValue = fieldObj.toString();
                     valueElement.addContent(fieldValue);
-
                     fieldElement.setContent(valueElement);
                     //arrayFields.add(fieldElement);
 

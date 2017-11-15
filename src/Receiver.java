@@ -59,8 +59,6 @@ public class Receiver extends Thread {
                 System.out.println("\n======================================================");
 
 
-
-
                 socket.close();
             }
             catch (Exception e){
