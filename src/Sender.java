@@ -369,13 +369,6 @@ public class Sender
                 System.out.println("Serializing object...");
                 Document document  = Serializer.serialize(obj);
 
-                System.out.println("checking document...");
-                Element rootElement = document.getRootElement();
-                System.out.println(rootElement.getName());
-                Element objElement = rootElement.getChild("object");
-                System.out.println(objElement.getName());
-                System.out.println(objElement.getChildren());
-
                 System.out.println("Creating file...");
                 File file = createXMLFile(document);
 

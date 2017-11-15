@@ -92,6 +92,12 @@ public class Serializer {
 
                         arrayReferences.add(referenceElement);
                         elementContents = arrayReferences;
+
+                        //recursively serialize objects on reference elements
+                        if(!objMap.containsKey(arrayObjId)){
+                            Object arrayElementObj = Array.get(obj, i);
+                            serializeObject(arrayElementObj, document, objMap);
+                        }
                     }
                 }
 
@@ -99,7 +105,7 @@ public class Serializer {
                 objElement.setContent(elementContents);
 
             }
-            else{
+
                 System.out.println("Serializing fields...");
                 //get list of all object fields
                 Field objFields[] = objClass.getDeclaredFields();
@@ -118,7 +124,7 @@ public class Serializer {
                     //objElement.addContent(arrayFields);
                     objElement.addContent(fieldElement);
 
-                }
+
             }
 
         }

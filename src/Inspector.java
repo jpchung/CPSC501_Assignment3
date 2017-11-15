@@ -72,6 +72,7 @@ public class Inspector {
             //get class
             inspectClass(obj, classObject, fieldObjects);
 
+            /*
             //traverse hierarchy get constructors/methods/field values that superclass declares
             Class superClassObject = classObject.getSuperclass();
             inspectSuperclass(obj, superClassObject);
@@ -81,6 +82,7 @@ public class Inspector {
             for(Class i: interfaceObjects){
                 inspectInterface(obj, i);
             }
+            */
 
             //check if need to introspect recursively on field objects
             if(recursive){
